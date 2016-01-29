@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<meta charset="UTF-8" />
+	<meta name="viewport"
+		content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+	<title>Subscription: #{index.subscription}</title>
+	
+	<h:outputScript library="js" name="stomp.js"></h:outputScript>
+	<link href='//fonts.googleapis.com/css?family=Montserrat:400,700'
+		rel='stylesheet' type='text/css' />
+	<link
+		href='//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css'
+		rel='stylesheet' type='text/css' />
+	<script type="text/javascript">
+	var requestUrl = "#{request.requestURL}";
+	var subscription = "#{index.subscription}";
+	var socketPath = "ws://"+window.location.host.replace(/:8080/, "")+":61614/stomp";
+		// "ws://"+serverName+":8080/local-chat/chat/room";
+		try {
+			window.addEventListener("load", function () {
+				
+			var client = Stomp.client(socketPath);
+			client.connect({
+				'login' : "guest", 
+				'passcode' :"guest",
+				'client-id' : subscription
+			}, function () {
+				// java:global/jms/topic/redoUndo
+				client.subscribe("jms.topic.redoUndo", function (m) {
+					alert(m);
+				}, {id: "redoUndo", "durable-subscriber-name" : "redoUndo"});
+			});
+			
+			});
+		} catch(e) {
+			// unsupported browser e.g. IE8
+			window.attachEvent( "onload", function () {
+				alert("Browser not supported");
+			});
+		} 
+	</script>
+</h:head>
+<body>
+</body>
+</html>
